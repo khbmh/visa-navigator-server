@@ -1,4 +1,3 @@
-// const { MongoClient, ServerApiVersion } = require('mongodb');
 require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const express = require('express');
@@ -13,9 +12,7 @@ app.use(express.json());
 const username = process.env.USER;
 const password = process.env.PASS;
 
-/*
-mongodb
-*/
+// MongoDB connection URL
 const uri = `mongodb+srv://${username}:${password}@cluster0.pzdjl.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -33,82 +30,137 @@ async function run() {
     await client.connect();
 
     const visaCollection = client.db('visaDB').collection('allVisa');
-
-    app.get('/allVisa', async (req, res) => {
-      const cursor = visaCollection.find();
-      const result = await cursor.toArray();
-      res.send(result);
-    });
-
-    app.get(`/allVisa/:id`, async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
-      const result = await visaCollection.findOne(query);
-      res.send(result);
-    });
-
-    app.post('/allVisa', async (req, res) => {
-      const newVisa = req.body;
-      const result = await visaCollection.insertOne(newVisa);
-      res.send(result);
-    });
-
-    app.put('/allVisa/:id', async (req, res) => {
-      const id = req.params.id;
-      const filter = { _id: new ObjectId(id) };
-      const options = { upsert: true };
-      const updatedVisa = { $set: req.body };
-      const result = await visaCollection.updateOne(
-        filter,
-        updatedVisa,
-        options,
-      );
-      res.send(result);
-    });
-
-    app.delete('/allVisa/:id', async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
-      const result = await visaCollection.deleteOne(query);
-      res.send(result);
-    });
-
-    /*
-applications
-    */
-
     const applicationCollection = client
       .db('visaDB')
       .collection('visaApplications');
 
+    // GET all visas
+    app.get('/allVisa', async (req, res) => {
+      try {
+        const cursor = visaCollection.find();
+        const result = await cursor.toArray();
+        res.send(result);
+      } catch (error) {
+        console.error('Error fetching visas:', error);
+        res
+          .status(500)
+          .send({ error: 'An error occurred while fetching visas.' });
+      }
+    });
+
+    // GET a single visa by ID
+    app.get('/allVisa/:id', async (req, res) => {
+      try {
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) };
+        const result = await visaCollection.findOne(query);
+        res.send(result);
+      } catch (error) {
+        console.error('Error fetching visa by ID:', error);
+        res
+          .status(500)
+          .send({ error: 'An error occurred while fetching the visa.' });
+      }
+    });
+
+    // POST a new visa
+    app.post('/allVisa', async (req, res) => {
+      try {
+        const newVisa = req.body;
+        const result = await visaCollection.insertOne(newVisa);
+        res.send(result);
+      } catch (error) {
+        console.error('Error inserting visa:', error);
+        res
+          .status(500)
+          .send({ error: 'An error occurred while inserting the visa.' });
+      }
+    });
+
+    // PUT (update) a visa by ID
+    app.put('/allVisa/:id', async (req, res) => {
+      try {
+        const id = req.params.id;
+        const filter = { _id: new ObjectId(id) };
+        const options = { upsert: true };
+        const updatedVisa = { $set: req.body };
+        const result = await visaCollection.updateOne(
+          filter,
+          updatedVisa,
+          options,
+        );
+        res.send(result);
+      } catch (error) {
+        console.error('Error updating visa:', error);
+        res
+          .status(500)
+          .send({ error: 'An error occurred while updating the visa.' });
+      }
+    });
+
+    // DELETE a visa by ID
+    app.delete('/allVisa/:id', async (req, res) => {
+      try {
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) };
+        const result = await visaCollection.deleteOne(query);
+        res.send(result);
+      } catch (error) {
+        console.error('Error deleting visa:', error);
+        res
+          .status(500)
+          .send({ error: 'An error occurred while deleting the visa.' });
+      }
+    });
+
+    // GET all visa applications
     app.get('/visaApplications', async (req, res) => {
-      const cursor = applicationCollection.find();
-      const result = await cursor.toArray();
-      res.send(result);
+      try {
+        const cursor = applicationCollection.find();
+        const result = await cursor.toArray();
+        res.send(result);
+      } catch (error) {
+        console.error('Error fetching visa applications:', error);
+        res
+          .status(500)
+          .send({
+            error: 'An error occurred while fetching visa applications.',
+          });
+      }
     });
 
+    // POST a new visa application
     app.post('/visaApplications', async (req, res) => {
-      const newVisa = req.body;
-      const result = await applicationCollection.insertOne(newVisa);
-      res.send(result);
+      try {
+        const newVisa = req.body;
+        const result = await applicationCollection.insertOne(newVisa);
+        res.send(result);
+      } catch (error) {
+        console.error('Error inserting visa application:', error);
+        res
+          .status(500)
+          .send({
+            error: 'An error occurred while inserting the visa application.',
+          });
+      }
     });
 
+    // DELETE a visa application by ID
     app.delete('/visaApplications/:id', async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
-      const result = await applicationCollection.deleteOne(query);
-      res.send(result);
+      try {
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) };
+        const result = await applicationCollection.deleteOne(query);
+        res.send(result);
+      } catch (error) {
+        console.error('Error deleting visa application:', error);
+        res
+          .status(500)
+          .send({
+            error: 'An error occurred while deleting the visa application.',
+          });
+      }
     });
-
-/*
- app.delete('/allVisa/:id', async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
-      const result = await visaCollection.deleteOne(query);
-      res.send(result);
-    });
-*/
-    
 
     // Send a ping to confirm a successful connection
     await client.db('admin').command({ ping: 1 });
@@ -120,16 +172,14 @@ applications
     // await client.close();
   }
 }
-run().catch(console.dir);
 
-/*
-mongodb
-*/
+run().catch(console.dir);
 
 app.get('/', (req, res) => {
   res.send('hello world');
 });
 
+// Vercel automatically assigns a port, so you don't need to specify a port in your code
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
