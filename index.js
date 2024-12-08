@@ -40,18 +40,75 @@ async function run() {
       res.send(result);
     });
 
+    app.get(`/allVisa/:id`, async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await visaCollection.findOne(query);
+      res.send(result);
+    });
+
     app.post('/allVisa', async (req, res) => {
       const newVisa = req.body;
       const result = await visaCollection.insertOne(newVisa);
       res.send(result);
     });
 
-    app.delete(`/allVisa/:id`, async (req, res) => {
+    app.put('/allVisa/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updatedVisa = { $set: req.body };
+      const result = await visaCollection.updateOne(
+        filter,
+        updatedVisa,
+        options,
+      );
+      res.send(result);
+    });
+
+    app.delete('/allVisa/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await visaCollection.deleteOne(query);
       res.send(result);
     });
+
+    /*
+applications
+    */
+
+    const applicationCollection = client
+      .db('visaDB')
+      .collection('visaApplications');
+
+    app.get('/visaApplications', async (req, res) => {
+      const cursor = applicationCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    app.post('/visaApplications', async (req, res) => {
+      const newVisa = req.body;
+      const result = await applicationCollection.insertOne(newVisa);
+      res.send(result);
+    });
+
+    app.delete('/visaApplications/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await applicationCollection.deleteOne(query);
+      res.send(result);
+    });
+
+/*
+ app.delete('/allVisa/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await visaCollection.deleteOne(query);
+      res.send(result);
+    });
+*/
+    
 
     // Send a ping to confirm a successful connection
     await client.db('admin').command({ ping: 1 });
