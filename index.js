@@ -26,9 +26,6 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
-
     const visaCollection = client.db('visaDB').collection('allVisa');
     const applicationCollection = client
       .db('visaDB')
@@ -121,11 +118,9 @@ async function run() {
         res.send(result);
       } catch (error) {
         console.error('Error fetching visa applications:', error);
-        res
-          .status(500)
-          .send({
-            error: 'An error occurred while fetching visa applications.',
-          });
+        res.status(500).send({
+          error: 'An error occurred while fetching visa applications.',
+        });
       }
     });
 
@@ -137,11 +132,9 @@ async function run() {
         res.send(result);
       } catch (error) {
         console.error('Error inserting visa application:', error);
-        res
-          .status(500)
-          .send({
-            error: 'An error occurred while inserting the visa application.',
-          });
+        res.status(500).send({
+          error: 'An error occurred while inserting the visa application.',
+        });
       }
     });
 
@@ -154,22 +147,12 @@ async function run() {
         res.send(result);
       } catch (error) {
         console.error('Error deleting visa application:', error);
-        res
-          .status(500)
-          .send({
-            error: 'An error occurred while deleting the visa application.',
-          });
+        res.status(500).send({
+          error: 'An error occurred while deleting the visa application.',
+        });
       }
     });
-
-    // Send a ping to confirm a successful connection
-    await client.db('admin').command({ ping: 1 });
-    console.log(
-      'Pinged your deployment. You successfully connected to MongoDB!',
-    );
   } finally {
-    // Ensures that the client will close when you finish/error
-    // await client.close();
   }
 }
 
